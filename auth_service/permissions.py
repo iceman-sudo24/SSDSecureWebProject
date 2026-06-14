@@ -81,8 +81,29 @@ class IsOwnerOrAdmin(BasePermission):
         # Check owner field (supports both 'owner' and 'user' FK names)
         owner = getattr(obj, "owner", None) or getattr(obj, "user", None)
         if owner is None:
+            logger.warning(
+                "IsOwnerOrAdmin: object '%s' has no owner attribute — denying access to '%s'",
+                obj, request.user.username,
+            )
             return False
-        return owner == request.user
+        if owner != request.user:
+            logger.warning(
+                "ACCESS_DENIED: user='%s' role='%s' tried to access object '%s' owned by '%s'",
+                request.user.username, request.user.role, obj, owner.username,
+            )
+            try:
+                from audit_service.utils import log_audit_event
+                log_audit_event(
+                    user=request.user,
+                    action="ACCESS_DENIED",
+                    service="auth_service",
+                    ip_address=request.META.get("REMOTE_ADDR", "unknown"),
+                    details=f"User '{request.user.username}' denied access to object owned by '{owner.username}'",
+                )
+            except Exception:
+                pass
+            return False
+        return True
 
 
 class IsOwner(BasePermission):
@@ -129,13 +150,26 @@ def admin_required(view_func):
             return HttpResponseForbidden("Authentication required.")
 
         if not request.user.is_admin:
+            ip = request.META.get("REMOTE_ADDR", "unknown")
             logger.warning(
-                "Non-admin access attempt: user='%s' role='%s' path='%s' ip='%s'",
+                "ACCESS_DENIED (admin_required): user='%s' role='%s' path='%s' ip='%s'",
                 request.user.username,
                 request.user.role,
                 request.path,
-                request.META.get("REMOTE_ADDR", "unknown"),
+                ip,
             )
+            # Log to audit service
+            try:
+                from audit_service.utils import log_audit_event
+                log_audit_event(
+                    user=request.user,
+                    action="ACCESS_DENIED",
+                    service="auth_service",
+                    ip_address=ip,
+                    details=f"Non-admin user '{request.user.username}' attempted to access admin resource: {request.path}",
+                )
+            except Exception:
+                pass
             return HttpResponseForbidden(
                 "You do not have permission to access this resource."
             )
@@ -170,15 +204,27 @@ def role_required(*roles):
                 return HttpResponseForbidden("Authentication required.")
 
             if request.user.role not in roles:
+                ip = request.META.get("REMOTE_ADDR", "unknown")
                 logger.warning(
-                    "Role-based access denied: user='%s' role='%s' "
+                    "ACCESS_DENIED (role_required): user='%s' role='%s' "
                     "required_roles=%s path='%s' ip='%s'",
                     request.user.username,
                     request.user.role,
                     roles,
                     request.path,
-                    request.META.get("REMOTE_ADDR", "unknown"),
+                    ip,
                 )
+                try:
+                    from audit_service.utils import log_audit_event
+                    log_audit_event(
+                        user=request.user,
+                        action="ACCESS_DENIED",
+                        service="auth_service",
+                        ip_address=ip,
+                        details=f"User '{request.user.username}' (role={request.user.role}) denied access to {request.path} (required: {roles})",
+                    )
+                except Exception:
+                    pass
                 return HttpResponseForbidden(
                     "You do not have permission to access this resource."
                 )
