@@ -74,10 +74,27 @@ Three logically separated microservices:
    python manage.py shell -c "from auth_service.models import User; u = User.objects.get(username='YOUR_USERNAME'); u.role = 'ADMIN'; u.save()"
    ```
 
-8. **Run the development server**
+8. **Create sample categories (optional)**
+   ```bash
+   python manage.py shell -c "
+   from inventory_service.models import Category
+   Category.objects.create(name='Electronics', description='Electronic devices')
+   Category.objects.create(name='Office Supplies', description='Office items')
+   Category.objects.create(name='Furniture', description='Office furniture')
+   "
+   ```
+
+9. **Run the development server**
    ```bash
    python manage.py runserver
    ```
+
+10. **Access the application**
+    - Login: http://localhost:8000/auth/login/
+    - Register: http://localhost:8000/auth/register/
+    - Inventory: http://localhost:8000/inventory/
+    - Audit Dashboard (admin): http://localhost:8000/audit/
+    - Django Admin: http://localhost:8000/admin/
 
 ## URL Structure
 
