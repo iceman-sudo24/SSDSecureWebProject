@@ -246,7 +246,30 @@ def item_detail(request, item_id):
     - OWASP A01:2021 - Broken Access Control (IDOR)
     - OWASP A09:2021 - Security Logging and Monitoring Failures
     """
-    item = get_object_or_404(InventoryItem, pk=item_id)
+    # Query-level IDOR prevention: filter through _get_user_items first
+    # This ensures non-admin users can only access their own items at the DB level
+    # Defense-in-depth: object-level check follows below
+    try:
+        item = _get_user_items(request.user).get(pk=item_id)
+    except InventoryItem.DoesNotExist:
+        logger.warning(
+            "IDOR attempt: user '%s' tried to access item '%s' not in their queryset",
+            request.user.username, item_id,
+        )
+        try:
+            from audit_service.utils import log_audit_event
+            log_audit_event(
+                user=request.user,
+                action="IDOR_ATTEMPT",
+                service="inventory_service",
+                ip_address=_get_client_ip(request),
+                details=f"Attempted access to item pk={item_id} via detail view",
+                resource_type="InventoryItem",
+                resource_id=str(item_id),
+            )
+        except Exception:
+            pass
+        return HttpResponseForbidden("You do not have permission to access this item.")
 
     # Object-level ownership check (second IDOR layer)
     denied = _check_ownership(request, item)
