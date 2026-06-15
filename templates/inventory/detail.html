@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.name }} - Inventory Detail{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <h1>{{ item.name }}</h1>
+    
+    <div class="detail-grid">
+        <div class="detail-card">
+            <h2>Item Details</h2>
+            <p><strong>SKU:</strong> {{ item.sku|default:"N/A" }}</p>
+            <p><strong>Category:</strong> {{ item.category.name|default:"Uncategorized" }}</p>
+            <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+            <p><strong>Price:</strong> ${{ item.price }}</p>
+            <p><strong>Status:</strong> 
+                <span class="status-badge status-{{ item.status|lower }}">{{ item.get_status_display }}</span>
+            </p>
+            {% if item.description %}
+            <p><strong>Description:</strong> {{ item.description }}</p>
+            {% endif %}
+            {% if is_admin %}
+            <p><strong>Owner:</strong> {{ item.owner.username }}</p>
+            {% endif %}
+            <p><strong>Created:</strong> {{ item.created_at|date:"F j, Y H:i" }}</p>
+            <p><strong>Updated:</strong> {{ item.updated_at|date:"F j, Y H:i" }}</p>
+        </div>
+
+        {% if item.image %}
+        <div class="detail-card">
+            <h2>Image</h2>
+            <img src="{{ item.image.url }}" alt="{{ item.name }}" class="item-image">
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="action-buttons">
+        <a href="{% url 'inventory_service:item_update' item_id=item.id %}" class="btn btn-primary">Edit</a>
+        <a href="{% url 'inventory_service:item_delete' item_id=item.id %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'inventory_service:item_list' %}" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
+{% endblock %}

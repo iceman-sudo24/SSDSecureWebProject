@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Create Item - Secure Inventory System{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Create Inventory Item</h1>
+    
+    <form method="post" action="{% url 'inventory_service:item_create' %}" 
+          class="auth-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Item Name</label>
+            <input type="text" id="name" name="name" required
+                   maxlength="100" pattern="[a-zA-Z0-9\s\-\.,()&']{1,100}"
+                   title="Letters, numbers, spaces, and basic punctuation only">
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" maxlength="1000" rows="4"></textarea>
+            <small>Maximum 1000 characters. No HTML tags allowed.</small>
+        </div>
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" name="category">
+                <option value="">-- Select Category --</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity" value="0"
+                       min="0" max="999999" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Price ($)</label>
+                <input type="number" id="price" name="price" value="0.00"
+                       min="0" max="9999999.99" step="0.01" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="sku">SKU</label>
+            <input type="text" id="sku" name="sku" maxlength="50"
+                   pattern="[A-Z0-9\-]{1,50}"
+                   title="Uppercase letters, numbers, and hyphens only"
+                   placeholder="e.g., ITEM-001">
+        </div>
+        <div class="form-group">
+            <label for="image">Image</label>
+            <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif">
+            <small>Max 5MB. JPG, PNG, or GIF only.</small>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Item</button>
+        <a href="{% url 'inventory_service:item_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
