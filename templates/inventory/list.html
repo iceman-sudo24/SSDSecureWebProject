@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory - Secure Inventory System{% endblock %}
+
+{% block content %}
+<div class="inventory-container">
+    <div class="page-header">
+        <h1>Inventory Items</h1>
+        <a href="{% url 'inventory_service:item_create' %}" class="btn btn-primary">+ Add Item</a>
+    </div>
+
+    <form method="get" action="{% url 'inventory_service:item_list' %}" class="filter-form">
+        <div class="filter-row">
+            <input type="text" name="q" placeholder="Search items..."
+                   value="{{ search_query }}" maxlength="200"
+                   pattern="[a-zA-Z0-9\s\.\-_,'@]{0,200}">
+            <select name="category">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if category_filter == cat.id|slugify %}selected{% endif %}>
+                    {{ cat.name }}
+                </option>
+                {% endfor %}
+            </select>
+            <select name="status">
+                <option value="">All Statuses</option>
+                <option value="ACTIVE" {% if status_filter == "ACTIVE" %}selected{% endif %}>Active</option>
+                <option value="INACTIVE" {% if status_filter == "INACTIVE" %}selected{% endif %}>Inactive</option>
+                <option value="OUT_OF_STOCK" {% if status_filter == "OUT_OF_STOCK" %}selected{% endif %}>Out of Stock</option>
+            </select>
+            <button type="submit" class="btn btn-secondary">Filter</button>
+        </div>
+    </form>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>SKU</th>
+                <th>Category</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Status</th>
+                {% if is_admin %}
+                <th>Owner</th>
+                {% endif %}
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td><a href="{% url 'inventory_service:item_detail' item_id=item.id %}">{{ item.name }}</a></td>
+                <td>{{ item.sku|default:"-" }}</td>
+                <td>{{ item.category.name|default:"-" }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.price }}</td>
+                <td><span class="status-badge status-{{ item.status|lower }}">{{ item.get_status_display }}</span></td>
+                {% if is_admin %}
+                <td>{{ item.owner.username }}</td>
+                {% endif %}
+                <td>{{ item.created_at|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="{% url 'inventory_service:item_detail' item_id=item.id %}" class="btn btn-small">View</a>
+                    <a href="{% url 'inventory_service:item_update' item_id=item.id %}" class="btn btn-small">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{% if is_admin %}9{% else %}8{% endif %}" class="no-data">
+                    No inventory items found. <a href="{% url 'inventory_service:item_create' %}">Create one?</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ item.name }} - Secure Inventory System{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Edit: {{ item.name }}</h1>
+    
+    <form method="post" action="{% url 'inventory_service:item_update' item_id=item.id %}" 
+          class="auth-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Item Name</label>
+            <input type="text" id="name" name="name" required
+                   value="{{ item.name }}" maxlength="100"
+                   pattern="[a-zA-Z0-9\s\-\.,()&']{1,100}">
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" maxlength="1000" rows="4">{{ item.description }}</textarea>
+            <small>Maximum 1000 characters. No HTML tags allowed.</small>
+        </div>
+        <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category" name="category">
+                <option value="">-- Select Category --</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if item.category_id == cat.id %}selected{% endif %}>
+                    {{ cat.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity"
+                       value="{{ item.quantity }}" min="0" max="999999" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Price ($)</label>
+                <input type="number" id="price" name="price"
+                       value="{{ item.price }}" min="0" max="9999999.99" step="0.01" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="sku">SKU</label>
+            <input type="text" id="sku" name="sku"
+                   value="{{ item.sku|default:'' }}" maxlength="50"
+                   pattern="[A-Z0-9\-]{1,50}"
+                   title="Uppercase letters, numbers, and hyphens only">
+        </div>
+        <div class="form-group">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+                <option value="ACTIVE" {% if item.status == "ACTIVE" %}selected{% endif %}>Active</option>
+                <option value="INACTIVE" {% if item.status == "INACTIVE" %}selected{% endif %}>Inactive</option>
+                <option value="OUT_OF_STOCK" {% if item.status == "OUT_OF_STOCK" %}selected{% endif %}>Out of Stock</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="image">Image</label>
+            <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif">
+            <small>Max 5MB. JPG, PNG, or GIF only. Leave empty to keep current image.</small>
+            {% if item.image %}
+            <p class="current-image">Current: {{ item.image.name }}</p>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Update Item</button>
+        <a href="{% url 'inventory_service:item_detail' item_id=item.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
