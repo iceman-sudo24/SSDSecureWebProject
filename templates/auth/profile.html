@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Secure Inventory System{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <h1>My Profile</h1>
+    
+    <div class="profile-info">
+        <div class="info-card">
+            <h2>Account Information</h2>
+            <p><strong>Username:</strong> {{ user_obj.username }}</p>
+            <p><strong>Email:</strong> {{ user_obj.email }}</p>
+            <p><strong>Role:</strong> {{ user_obj.get_role_display }}</p>
+            <p><strong>Member since:</strong> {{ user_obj.created_at|date:"F j, Y" }}</p>
+            <p><strong>Last login:</strong> {{ user_obj.last_login|date:"F j, Y H:i" }}</p>
+        </div>
+    </div>
+
+    <div class="profile-edit">
+        <h2>Edit Profile</h2>
+        <form method="post" action="{% url 'auth_service:profile' %}" class="auth-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name"
+                       value="{{ user_obj.first_name }}" maxlength="50"
+                       pattern="[a-zA-Z\s\-']{1,50}">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name"
+                       value="{{ user_obj.last_name }}" maxlength="50"
+                       pattern="[a-zA-Z\s\-']{1,50}">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email"
+                       value="{{ user_obj.email }}" maxlength="254">
+            </div>
+            <div class="form-group">
+                <label for="phone_number">Phone Number</label>
+                <input type="tel" id="phone_number" name="phone_number"
+                       value="{{ user_obj.phone_number|default:'' }}" maxlength="17"
+                       pattern="\+?1?\d{9,15}"
+                       placeholder="+1234567890">
+            </div>
+            <div class="form-group">
+                <label for="bio">Bio</label>
+                <textarea id="bio" name="bio" maxlength="500" rows="4">{{ profile.bio }}</textarea>
+                <small>Maximum 500 characters. No HTML tags allowed.</small>
+            </div>
+            <div class="form-group">
+                <label for="organization">Organization</label>
+                <input type="text" id="organization" name="organization"
+                       value="{{ profile.organization }}" maxlength="100"
+                       pattern="[a-zA-Z0-9\s\-\.,&']{1,100}">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
