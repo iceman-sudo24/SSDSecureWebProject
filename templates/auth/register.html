@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Secure Inventory System{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h1>Register</h1>
+    <form method="post" action="{% url 'auth_service:register' %}" class="auth-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required
+                   maxlength="30" pattern="[a-zA-Z][a-zA-Z0-9_-]{2,29}"
+                   title="3-30 characters, start with a letter"
+                   autocomplete="username">
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required
+                   maxlength="254" autocomplete="email">
+        </div>
+        <div class="form-group">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" required
+                   maxlength="50" pattern="[a-zA-Z\s\-']{1,50}"
+                   autocomplete="given-name">
+        </div>
+        <div class="form-group">
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" required
+                   maxlength="50" pattern="[a-zA-Z\s\-']{1,50}"
+                   autocomplete="family-name">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required
+                   minlength="12" autocomplete="new-password">
+            <small>Minimum 12 characters. Must not be entirely numeric.</small>
+        </div>
+        <div class="form-group">
+            <label for="password_confirm">Confirm Password</label>
+            <input type="password" id="password_confirm" name="password_confirm" required
+                   minlength="12" autocomplete="new-password">
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+    <p class="auth-link">Already have an account? <a href="{% url 'auth_service:login' %}">Login here</a></p>
+</div>
+{% endblock %}
