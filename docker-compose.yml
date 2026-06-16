@@ -1,0 +1,50 @@
+# =============================================================================
+# Docker Compose — Secure Microservice Django Application
+# =============================================================================
+# Single-service configuration for containerized deployment.
+#
+# Usage:
+#   cp .env.example .env   # Configure environment variables
+#   docker-compose up --build
+#   docker-compose exec web python manage.py makemigrations auth_service inventory_service audit_service
+#   docker-compose exec web python manage.py migrate
+#   docker-compose exec web python manage.py createsuperuser
+#
+# Security features:
+# - Environment variables loaded from .env file (not hardcoded)
+# - Named volumes for persistent data
+# - Health check for container orchestration
+# - Non-root user configured in Dockerfile
+#
+# Maps to:
+# - OWASP A05:2021 - Security Misconfiguration
+# - NIST SSDF PW.4 - Secure Coding Practices
+
+version: "3.8"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: secure-inventory-web
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - media_uploads:/app/media/uploads
+      - app_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  media_uploads:
+    driver: local
+  app_logs:
+    driver: local

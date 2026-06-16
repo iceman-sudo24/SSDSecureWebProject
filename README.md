@@ -96,6 +96,34 @@ Three logically separated microservices:
     - Audit Dashboard (admin): http://localhost:8000/audit/
     - Django Admin: http://localhost:8000/admin/
 
+## Docker Setup
+
+```bash
+# Copy environment file
+cp .env.example .env
+# Edit .env and set DJANGO_SECRET_KEY to a strong random key
+
+# Build and run
+docker-compose up --build
+
+# Run migrations (in a separate terminal)
+docker-compose exec web python manage.py makemigrations auth_service inventory_service audit_service
+docker-compose exec web python manage.py migrate
+
+# Create superuser
+docker-compose exec web python manage.py createsuperuser
+
+# Set superuser role to ADMIN
+docker-compose exec web python manage.py shell -c "from auth_service.models import User; u = User.objects.get(username='YOUR_USERNAME'); u.role = 'ADMIN'; u.save()"
+```
+
+The Docker setup includes:
+- Multi-stage build for minimal image size
+- Non-root user (`appuser`) for container security
+- Gunicorn WSGI server with 3 workers
+- Health checks for container orchestration
+- Named volumes for media uploads and logs
+
 ## URL Structure
 
 | URL Pattern | Service | Access Level |
