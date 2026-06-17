@@ -138,6 +138,8 @@ The Docker setup includes:
 | `/api/inventory/` | Inventory REST API | Authenticated |
 | `/api/audit/` | Audit REST API | Admin Only |
 
+## Screenshots of the Web Application
+
 ## License
 
 This project is developed for educational purposes.
