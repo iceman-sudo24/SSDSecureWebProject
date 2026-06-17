@@ -74,8 +74,10 @@ class Command(BaseCommand):
         # ── Step 3: Create sample categories ───────────────────────────
         categories_created = self._create_categories()
 
-        # ── Step 4: Create sample inventory items (owned by admin) ─────
-        items_created = self._create_inventory_items()
+        # ── Step 4: Create sample inventory items ─────────────────────
+        admin_items_created = self._create_admin_inventory_items()
+        test_items_created = self._create_test_inventory_items()
+        items_created = admin_items_created + test_items_created
 
         # ── Summary ────────────────────────────────────────────────────
         self.stdout.write("")
@@ -103,7 +105,9 @@ class Command(BaseCommand):
 
         self.stdout.write("")
         self.stdout.write(self.style.SUCCESS(f"  {categories_created} categories created."))
-        self.stdout.write(self.style.SUCCESS(f"  {items_created} inventory items created."))
+        self.stdout.write(self.style.SUCCESS(
+            f"  {admin_items_created} admin items + {test_items_created} test items created."
+        ))
 
         self.stdout.write("")
         self.stdout.write(self.style.WARNING(
@@ -159,7 +163,7 @@ class Command(BaseCommand):
 
         return created_count
 
-    def _create_inventory_items(self):
+    def _create_admin_inventory_items(self):
         """Create sample inventory items owned by the admin user. Returns count created."""
         try:
             admin = User.objects.get(username=ADMIN_USERNAME)
@@ -200,12 +204,49 @@ class Command(BaseCommand):
             },
         ]
 
+        return self._bulk_create_items(admin, item_data)
+
+    def _create_test_inventory_items(self):
+        """Create sample inventory items owned by the test user. Returns count created."""
+        try:
+            test_user = User.objects.get(username=TEST_USERNAME)
+        except User.DoesNotExist:
+            return 0
+
+        electronics = Category.objects.filter(name="Electronics").first()
+        office = Category.objects.filter(name="Office Supplies").first()
+
+        item_data = [
+            {
+                "name": "Wireless Keyboard",
+                "description": "Logitech K380 multi-device Bluetooth keyboard.",
+                "category": electronics,
+                "quantity": 12,
+                "price": "39.99",
+                "sku": "ELEC-WL-KB",
+                "status": InventoryItem.Status.ACTIVE,
+            },
+            {
+                "name": "LED Desk Lamp",
+                "description": "Adjustable LED desk lamp with USB charging port.",
+                "category": office,
+                "quantity": 6,
+                "price": "24.50",
+                "sku": "OFF-LED-LAMP",
+                "status": InventoryItem.Status.ACTIVE,
+            },
+        ]
+
+        return self._bulk_create_items(test_user, item_data)
+
+    def _bulk_create_items(self, owner, item_data):
+        """Create inventory items for a given owner. Returns count created."""
         created_count = 0
         for data in item_data:
             obj, created = InventoryItem.objects.get_or_create(
                 sku=data["sku"],
                 defaults={
-                    "owner": admin,
+                    "owner": owner,
                     "name": data["name"],
                     "description": data["description"],
                     "category": data["category"],
