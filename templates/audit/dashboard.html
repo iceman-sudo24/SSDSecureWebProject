@@ -1,0 +1,103 @@
+{% comment %} Audit Dashboard Template - Admin Only {% endcomment %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Audit Log Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Audit Log Dashboard</h1>
+    <p class="text-muted">Admin-only security event monitoring</p>
+</div>
+
+{% comment %} Summary Cards {% endcomment %}
+{% if summary %}
+<div class="summary-grid">
+    <div class="summary-card">
+        <h3>Total Events</h3>
+        <p class="summary-number">{{ summary.total_events }}</p>
+        <span class="text-muted">Last {{ current_days }} day{{ current_days|pluralize }}</span>
+    </div>
+    {% for action, count in summary.events_by_action.items %}
+    <div class="summary-card">
+        <h3>{{ action }}</h3>
+        <p class="summary-number">{{ count }}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% comment %} Filter Form {% endcomment %}
+<div class="filter-form">
+    <form method="get" action="">
+        <div class="filter-row">
+            <div class="form-group">
+                <label for="search">Search</label>
+                <input type="text" id="search" name="search" value="{{ current_search }}"
+                       placeholder="Username, details, IP..." maxlength="200">
+            </div>
+            <div class="form-group">
+                <label for="service">Service</label>
+                <select id="service" name="service">
+                    <option value="">All Services</option>
+                    {% for svc in valid_services %}
+                    <option value="{{ svc }}" {% if svc == current_service %}selected{% endif %}>{{ svc }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="action">Action</label>
+                <select id="action" name="action">
+                    <option value="">All Actions</option>
+                    {% for act in valid_actions %}
+                    <option value="{{ act }}" {% if act == current_action %}selected{% endif %}>{{ act }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="days">Period</label>
+                <select id="days" name="days">
+                    {% for d in valid_days %}
+                    <option value="{{ d }}" {% if d == current_days %}selected{% endif %}>{{ d }} days</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% comment %} Audit Log Table {% endcomment %}
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Action</th>
+                <th>User</th>
+                <th>Service</th>
+                <th>IP Address</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                <td><span class="status-badge status-{{ log.action|lower }}">{{ log.action }}</span></td>
+                <td>{{ log.username|default:"—" }}</td>
+                <td>{{ log.service }}</td>
+                <td>{{ log.ip_address|default:"—" }}</td>
+                <td>{{ log.details|truncatewords:20 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No audit logs found for the selected filters.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
