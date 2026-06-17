@@ -64,32 +64,32 @@ Three logically separated microservices:
    python manage.py migrate
    ```
 
-6. **Create a superuser (admin)**
+6. **Seed the database (recommended)**
+   ```bash
+   python manage.py seed_data
+   ```
+   This creates a default admin account, a test user, sample categories, and 3 sample inventory items.
+
+   | Account     | Username   | Password         | Role  |
+   |-------------|------------|------------------|-------|
+   | Admin       | `admin`    | `Admin@12345678` | ADMIN |
+   | Test User   | `testuser` | `Test@123456789` | USER  |
+
+   > **Security Note:** Default credentials are for development/evaluation only. Change all passwords before any non-development deployment.
+
+   **Alternatively**, create a superuser manually:
    ```bash
    python manage.py createsuperuser
-   ```
-
-7. **Set the superuser role to ADMIN**
-   ```bash
+   # Then set the role to ADMIN:
    python manage.py shell -c "from auth_service.models import User; u = User.objects.get(username='YOUR_USERNAME'); u.role = 'ADMIN'; u.save()"
    ```
 
-8. **Create sample categories (optional)**
-   ```bash
-   python manage.py shell -c "
-   from inventory_service.models import Category
-   Category.objects.create(name='Electronics', description='Electronic devices')
-   Category.objects.create(name='Office Supplies', description='Office items')
-   Category.objects.create(name='Furniture', description='Office furniture')
-   "
-   ```
-
-9. **Run the development server**
+7. **Run the development server**
    ```bash
    python manage.py runserver
    ```
 
-10. **Access the application**
+8. **Access the application**
     - Login: http://localhost:8000/auth/login/
     - Register: http://localhost:8000/auth/register/
     - Inventory: http://localhost:8000/inventory/
@@ -111,10 +111,10 @@ docker-compose exec web python manage.py makemigrations auth_service inventory_s
 docker-compose exec web python manage.py migrate
 
 # Create superuser
-docker-compose exec web python manage.py createsuperuser
+docker-compose exec web python manage.py seed_data
 
-# Set superuser role to ADMIN
-docker-compose exec web python manage.py shell -c "from auth_service.models import User; u = User.objects.get(username='YOUR_USERNAME'); u.role = 'ADMIN'; u.save()"
+# Alternatively, create a superuser manually:
+# docker-compose exec web python manage.py createsuperuser
 ```
 
 The Docker setup includes:
