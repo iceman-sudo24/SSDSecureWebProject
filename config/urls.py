@@ -28,3 +28,26 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler403 = csrf_failure_view
+
+
+def custom_404(request, exception):
+    """Custom 404 page - no information disclosure."""
+    from django.shortcuts import render
+    return render(request, "errors/404.html", status=404)
+
+
+def custom_500(request):
+    """Custom 500 page - no stack traces exposed."""
+    from django.shortcuts import render
+    return render(request, "errors/500.html", status=500)
+
+
+def custom_400(request, exception):
+    """Custom 400 page - safe error message."""
+    from django.shortcuts import render
+    return render(request, "errors/400.html", status=400)
+
+
+handler404 = custom_404
+handler500 = custom_500
+handler400 = custom_400

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}400 Bad Request{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <h1>400 — Bad Request</h1>
+    <p>The server could not understand your request. Please check your input and try again.</p>
+    <a href="{% url 'auth_service:login' %}" class="btn btn-primary">Go to Login</a>
+</div>
+{% endblock %}
