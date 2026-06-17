@@ -19,9 +19,7 @@
             {% if item.description %}
             <p><strong>Description:</strong> {{ item.description }}</p>
             {% endif %}
-            {% if is_admin %}
             <p><strong>Owner:</strong> {{ item.owner.username }}</p>
-            {% endif %}
             <p><strong>Created:</strong> {{ item.created_at|date:"F j, Y H:i" }}</p>
             <p><strong>Updated:</strong> {{ item.updated_at|date:"F j, Y H:i" }}</p>
         </div>
@@ -35,8 +33,10 @@
     </div>
 
     <div class="action-buttons">
+        {% if is_admin or item.owner == user %}
         <a href="{% url 'inventory_service:item_update' item_id=item.id %}" class="btn btn-primary">Edit</a>
         <a href="{% url 'inventory_service:item_delete' item_id=item.id %}" class="btn btn-danger">Delete</a>
+        {% endif %}
         <a href="{% url 'inventory_service:item_list' %}" class="btn btn-secondary">Back to List</a>
     </div>
 </div>

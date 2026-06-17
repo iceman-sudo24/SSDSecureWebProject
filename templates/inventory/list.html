@@ -41,9 +41,7 @@
                 <th>Quantity</th>
                 <th>Price</th>
                 <th>Status</th>
-                {% if is_admin %}
                 <th>Owner</th>
-                {% endif %}
                 <th>Created</th>
                 <th>Actions</th>
             </tr>
@@ -57,18 +55,18 @@
                 <td>{{ item.quantity }}</td>
                 <td>${{ item.price }}</td>
                 <td><span class="status-badge status-{{ item.status|lower }}">{{ item.get_status_display }}</span></td>
-                {% if is_admin %}
                 <td>{{ item.owner.username }}</td>
-                {% endif %}
                 <td>{{ item.created_at|date:"Y-m-d" }}</td>
                 <td>
                     <a href="{% url 'inventory_service:item_detail' item_id=item.id %}" class="btn btn-small">View</a>
+                    {% if is_admin or item.owner == user %}
                     <a href="{% url 'inventory_service:item_update' item_id=item.id %}" class="btn btn-small">Edit</a>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="{% if is_admin %}9{% else %}8{% endif %}" class="no-data">
+                <td colspan="10" class="no-data">
                     No inventory items found. <a href="{% url 'inventory_service:item_create' %}">Create one?</a>
                 </td>
             </tr>

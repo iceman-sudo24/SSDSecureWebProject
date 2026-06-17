@@ -79,21 +79,17 @@ def _get_client_ip(request):
 
 def _get_user_items(user):
     """
-    Return the queryset of items the user is authorised to see.
+    Return the queryset of items the user is authorised to view.
 
-    This is the primary, query-level IDOR prevention layer.
-    Admins see all items; normal users see only their own.
-    Filtering happens at the database level, not in Python, so a user
-    can never accidentally receive another user's items.
+    All authenticated users can view all items (shared inventory).
+    Write operations (update/delete) are protected separately by
+    _check_ownership() and the IsOwnerOrAdmin DRF permission class.
 
     Maps to:
-    - OWASP A01:2021 - Broken Access Control (IDOR prevention)
+    - OWASP A01:2021 - Broken Access Control (view-level access)
     - ASVS V4.2 - Operation Level Access Control
     """
-    qs = InventoryItem.objects.select_related("owner", "category")
-    if user.is_admin:
-        return qs.all()
-    return qs.filter(owner=user)
+    return InventoryItem.objects.select_related("owner", "category").all()
 
 
 def _log_inventory_event(request, item, action, field_changed="", old_value="", new_value=""):
@@ -246,35 +242,9 @@ def item_detail(request, item_id):
     - OWASP A01:2021 - Broken Access Control (IDOR)
     - OWASP A09:2021 - Security Logging and Monitoring Failures
     """
-    # Query-level IDOR prevention: filter through _get_user_items first
-    # This ensures non-admin users can only access their own items at the DB level
-    # Defense-in-depth: object-level check follows below
-    try:
-        item = _get_user_items(request.user).get(pk=item_id)
-    except InventoryItem.DoesNotExist:
-        logger.warning(
-            "IDOR attempt: user '%s' tried to access item '%s' not in their queryset",
-            request.user.username, item_id,
-        )
-        try:
-            from audit_service.utils import log_audit_event
-            log_audit_event(
-                user=request.user,
-                action="IDOR_ATTEMPT",
-                service="inventory_service",
-                ip_address=_get_client_ip(request),
-                details=f"Attempted access to item pk={item_id} via detail view",
-                resource_type="InventoryItem",
-                resource_id=str(item_id),
-            )
-        except Exception:
-            pass
-        return HttpResponseForbidden("You do not have permission to access this item.")
-
-    # Object-level ownership check (second IDOR layer)
-    denied = _check_ownership(request, item)
-    if denied:
-        return denied
+    # All authenticated users can view any item (shared inventory).
+    # Write operations (update/delete) are protected by _check_ownership().
+    item = get_object_or_404(InventoryItem, pk=item_id)
 
     _log_inventory_event(request, item, InventoryAuditLog.Action.VIEWED)
 

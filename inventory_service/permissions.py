@@ -36,6 +36,11 @@ class IsOwnerOrAdmin(BasePermission):
         return request.user and request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
+        # Read-only access (GET, HEAD, OPTIONS) allowed for all authenticated users
+        if request.method in SAFE_METHODS:
+            return True
+
+        # Write operations (PUT, PATCH, DELETE) require admin or ownership
         if request.user.is_admin:
             return True
 
@@ -51,7 +56,7 @@ class IsOwnerOrAdmin(BasePermission):
 
         if obj.owner != request.user:
             logger.warning(
-                "IDOR attempt: user '%s' tried to access item '%s' owned by '%s'",
+                "IDOR attempt: user '%s' tried to modify item '%s' owned by '%s'",
                 request.user.username,
                 getattr(obj, "pk", "unknown"),
                 obj.owner.username,
