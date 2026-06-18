@@ -1,12 +1,12 @@
 # Core Django
-Django==4.2.21
+Django==4.2.30
 djangorestframework==3.16.0
 
 # Password Hashing - Argon2 (recommended by OWASP)
 argon2-cffi==23.1.0
 
 # Environment Variable Management
-python-dotenv==1.1.0
+python-dotenv==1.1.0  # 1.2.2 requires Python 3.10+
 
 # CORS
 django-cors-headers==4.7.0
@@ -15,7 +15,7 @@ django-cors-headers==4.7.0
 python-magic==0.4.27
 
 # Image processing
-Pillow
+Pillow==11.3.0  # 12.x requires Python 3.10+
 
 # Security Headers
 django-csp==3.8
