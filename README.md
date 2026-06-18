@@ -1,6 +1,6 @@
 # Secure Microservice-Based Web Application
 
-A Django-based secure web application following OWASP Top 10, OWASP ASVS, and NIST SSDF guidelines.
+A Django-based secure web application following OWASP Top 10, OWASP ASVS, and NIST SSDF guidelines. This is the second repository made for this project due to issues with the previous repository in terms of proper conventions and the learning process.
 
 ## Architecture
 
