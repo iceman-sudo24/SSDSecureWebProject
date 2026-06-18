@@ -141,6 +141,32 @@ The Docker setup includes:
 | `/api/audit/` | Audit REST API | Admin Only |
 
 ## Screenshots of the Web Application
+### Register
+<img width="1680" height="945" alt="Screenshot 2026-06-18 at 1 45 22 PM" src="https://github.com/user-attachments/assets/92115afe-048d-49ae-afcc-fde7c40ef067" />
+
+### Login 
+<img width="1679" height="946" alt="Screenshot 2026-06-18 at 1 44 51 PM" src="https://github.com/user-attachments/assets/0a85ae2f-a170-4737-9d84-907bf662abde" />
+
+### Inventory 
+<img width="1680" height="944" alt="Screenshot 2026-06-18 at 1 51 52 PM" src="https://github.com/user-attachments/assets/595282e1-0f13-4c57-a500-8a665d8ad651" />
+
+### Add Item
+<img width="1680" height="944" alt="Screenshot 2026-06-18 at 1 51 58 PM" src="https://github.com/user-attachments/assets/eabee833-dcaa-47ac-b274-056506af66c2" />
+
+### Edit Item
+<img width="1680" height="946" alt="Screenshot 2026-06-18 at 1 56 29 PM" src="https://github.com/user-attachments/assets/3ac3ae28-d4bd-4561-a426-bc1e102322c4" />
+
+### Profile
+<img width="1680" height="942" alt="Screenshot 2026-06-18 at 1 54 08 PM" src="https://github.com/user-attachments/assets/b9d5d343-9409-47eb-989f-1efd063a4d84" />
+
+### Admin Inventory 
+<img width="1680" height="943" alt="Screenshot 2026-06-18 at 1 54 23 PM" src="https://github.com/user-attachments/assets/40c296b3-2d11-43b9-a0ac-efc570cc3fa1" />
+
+### Admin Audit Dashboard
+<img width="1677" height="939" alt="Screenshot 2026-06-18 at 1 54 32 PM" src="https://github.com/user-attachments/assets/bed206f3-5611-48ac-ae9c-287fd8b7d896" />
+<img width="1680" height="939" alt="Screenshot 2026-06-18 at 1 54 41 PM" src="https://github.com/user-attachments/assets/a55deba9-ed7b-4daf-acf4-fff90b2c43b8" />
+
+
 
 ## License
 
