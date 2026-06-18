@@ -29,11 +29,11 @@ logger = logging.getLogger("django")
 
 # Default credentials — development/evaluation only
 ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "Admin@12345678"
+ADMIN_PASSWORD = "Admin@12345678"  # nosec B105 — intentional dev default, documented
 ADMIN_EMAIL = "admin@example.com"
 
 TEST_USERNAME = "testuser"
-TEST_PASSWORD = "Test@123456789"
+TEST_PASSWORD = "Test@123456789"  # nosec B105 — intentional dev default, documented
 TEST_EMAIL = "testuser@example.com"
 
 

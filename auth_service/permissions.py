@@ -100,8 +100,8 @@ class IsOwnerOrAdmin(BasePermission):
                     ip_address=request.META.get("REMOTE_ADDR", "unknown"),
                     details=f"User '{request.user.username}' denied access to object owned by '{owner.username}'",
                 )
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.debug("Failed to log ACCESS_DENIED to audit service: %s", exc)
             return False
         return True
 
@@ -168,8 +168,8 @@ def admin_required(view_func):
                     ip_address=ip,
                     details=f"Non-admin user '{request.user.username}' attempted to access admin resource: {request.path}",
                 )
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.debug("Failed to log ACCESS_DENIED to audit service: %s", exc)
             return HttpResponseForbidden(
                 "You do not have permission to access this resource."
             )
@@ -223,8 +223,8 @@ def role_required(*roles):
                         ip_address=ip,
                         details=f"User '{request.user.username}' (role={request.user.role}) denied access to {request.path} (required: {roles})",
                     )
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.debug("Failed to log ACCESS_DENIED to audit service: %s", exc)
                 return HttpResponseForbidden(
                     "You do not have permission to access this resource."
                 )

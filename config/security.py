@@ -40,7 +40,7 @@ class SecurityHeadersMiddleware:
         response["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()"
         response["Content-Security-Policy"] = (
             "default-src 'self'; script-src 'self'; "
-            "style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
+            "style-src 'self'; img-src 'self' data:; "
             "font-src 'self'; frame-ancestors 'none'; "
             "base-uri 'self'; form-action 'self';"
         )
@@ -113,7 +113,7 @@ def verify_service_token(request):
     token = auth_header[7:]
     expected_token = getattr(settings, "SERVICE_AUTH_TOKEN", "")
     
-    if not expected_token or expected_token == "change-me-in-production":
+    if not expected_token or expected_token == "change-me-in-production":  # nosec B105 — sentinel check, not a password
         logger.error("SERVICE_AUTH_TOKEN is not configured properly!")
         return False
     

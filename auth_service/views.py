@@ -81,7 +81,7 @@ def _get_client_ip(request):
     if x_forwarded_for:
         # Take the first IP (client) from the chain
         return x_forwarded_for.split(",")[0].strip()
-    return request.META.get("REMOTE_ADDR", "0.0.0.0")
+    return request.META.get("REMOTE_ADDR", "unknown")
 
 
 def _log_audit_event(user, action, ip_address, details=""):
