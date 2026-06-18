@@ -59,7 +59,7 @@
                 <td>{{ item.created_at|date:"Y-m-d" }}</td>
                 <td>
                     <a href="{% url 'inventory_service:item_detail' item_id=item.id %}" class="btn btn-small">View</a>
-                    {% if is_admin or item.owner == user %}
+                    {% if user.is_admin or item.owner == user %}
                     <a href="{% url 'inventory_service:item_update' item_id=item.id %}" class="btn btn-small">Edit</a>
                     {% endif %}
                 </td>

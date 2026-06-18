@@ -33,7 +33,7 @@
     </div>
 
     <div class="action-buttons">
-        {% if is_admin or item.owner == user %}
+        {% if user.is_admin or item.owner == user %}
         <a href="{% url 'inventory_service:item_update' item_id=item.id %}" class="btn btn-primary">Edit</a>
         <a href="{% url 'inventory_service:item_delete' item_id=item.id %}" class="btn btn-danger">Delete</a>
         {% endif %}
