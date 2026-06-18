@@ -1,4 +1,4 @@
-# Secure Microservice-Based Web Application
+# Secure Microservice-Based Inventory Asset Management Web Application 
 
 A Django-based secure web application following OWASP Top 10, OWASP ASVS, and NIST SSDF guidelines. 
 
